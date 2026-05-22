@@ -2,18 +2,6 @@ import { useEffect, useState } from 'react'
 import { authDev, authWithTelegram } from '../api/auth'
 import { getProfile, type UserProfile } from '../api/profile'
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp?: {
-        initData: string
-        ready: () => void
-        expand: () => void
-      }
-    }
-  }
-}
-
 export function useAuth() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)

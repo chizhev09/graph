@@ -1,3 +1,4 @@
+# Production image — без Playwright (меньше RAM, быстрее build на VPS)
 FROM public.ecr.aws/docker/library/python:3.12-slim
 
 WORKDIR /app
@@ -10,15 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-RUN playwright install chromium --with-deps
-
 COPY . .
 
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-RUN useradd -m -u 1000 graph && chown -R graph:graph /app /ms-playwright
+RUN useradd -m -u 1000 graph && chown -R graph:graph /app
 USER graph
 
 EXPOSE 8000

@@ -81,6 +81,9 @@ def parse_brands(content: str) -> dict:
 
 def main() -> None:
     if not FILTER_DATA.exists():
+        if OUTPUT.exists():
+            print(f"Skip sync (no frontend in image), using {OUTPUT}")
+            return
         raise SystemExit(f"filter-data.ts not found: {FILTER_DATA}")
     content = FILTER_DATA.read_text(encoding="utf-8")
     cities_content = CITIES_DATA.read_text(encoding="utf-8") if CITIES_DATA.exists() else content

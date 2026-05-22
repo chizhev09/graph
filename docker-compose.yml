@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: public.ecr.aws/docker/library/postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: graph
       POSTGRES_PASSWORD: graph
@@ -11,24 +12,22 @@ services:
       test: ["CMD-SHELL", "pg_isready -U graph"]
       interval: 5s
       timeout: 5s
-      retries: 5
-    ports:
-      - "5433:5432"
+      retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: public.ecr.aws/docker/library/redis:7-alpine
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
-      retries: 5
-    ports:
-      - "6379:6379"
+      retries: 10
 
   backend:
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.prod
+    restart: unless-stopped
     env_file:
       - ./backend/.env
     environment:
@@ -39,34 +38,72 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    ports:
-      - "8000:8000"
-    command: >
-      sh -c "alembic upgrade head &&
-             uvicorn main:app --host 0.0.0.0 --port 8000"
     volumes:
       - ./backend/data:/app/data
+    command: >
+      sh -c "if [ ! -f data/categories.json ]; then python scripts/sync_categories.py; fi &&
+             alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  telegram_bot:
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile.prod
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    command: python -m bot
+    depends_on:
+      - backend
+
+  nginx:
+    image: public.ecr.aws/docker/library/nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /var/www/certbot:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+      - frontend
 
   celery_worker:
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.workers
+    restart: unless-stopped
     env_file:
       - ./backend/.env
     environment:
       DATABASE_URL: postgresql+asyncpg://graph:graph@postgres:5432/graph
       REDIS_URL: redis://redis:6379/0
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     depends_on:
-      - backend
-      - redis
-    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=4
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    shm_size: "512mb"
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=1
     volumes:
       - ./backend/data:/app/data
 
   celery_beat:
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.prod
+    restart: unless-stopped
     env_file:
       - ./backend/.env
     environment:
@@ -77,9 +114,11 @@ services:
     command: celery -A app.workers.celery_app beat --loglevel=info
 
   telegram_listener:
+    profiles: ["telegram"]
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.prod
+    restart: unless-stopped
     env_file:
       - ./backend/.env
     environment:
@@ -89,25 +128,6 @@ services:
     command: python -m app.workers.telegram_listener
     volumes:
       - ./backend/data:/app/data
-    profiles:
-      - telegram
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:80"
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - backend
-      - frontend
 
 volumes:
   postgres_data:

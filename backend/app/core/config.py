@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
 
     bot_token: str = Field(default="", alias="BOT_TOKEN")
+    web_app_url: str = Field(default="https://pushes.su", alias="WEB_APP_URL")
     telegram_api_id: int = Field(default=0, alias="TELEGRAM_API_ID")
     telegram_api_hash: str = Field(default="", alias="TELEGRAM_API_HASH")
     premium_channel_id: str = Field(default="", alias="PREMIUM_CHANNEL_ID")

@@ -13,7 +13,9 @@ import {
   type ExclusionId,
   type SourceId,
 } from './filter-data'
+import { CitySelect } from './city-select'
 import { Divider } from './divider'
+import { useTelegramViewport } from '../../../hooks/useTelegramViewport'
 import './main.css'
 
 const HERO_IMAGE = '/hiro_image.webp'
@@ -43,6 +45,7 @@ function countSelected(selected: SelectedBrands): number {
 }
 
 export function Main() {
+  useTelegramViewport()
   const { profile } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [menuView, setMenuView] = useState<'nav' | 'settings'>('nav')
@@ -314,22 +317,11 @@ export function Main() {
             <h4 id="city-heading" className="main__exclusions-title">
               Город
             </h4>
-            <div className="main__chips main__chips--scroll" role="group" aria-label="Город">
-              {CITIES.map((city) => {
-                const isActive = selectedCity === city.id
-                return (
-                  <button
-                    key={city.id}
-                    type="button"
-                    className={`main__chip main__chip--brand${isActive ? ' main__chip--active' : ''}`}
-                    aria-pressed={isActive}
-                    onClick={() => setSelectedCity(city.id)}
-                  >
-                    <span className="main__chip-label">{city.label}</span>
-                  </button>
-                )
-              })}
-            </div>
+            <CitySelect
+              cities={CITIES}
+              value={selectedCity}
+              onChange={setSelectedCity}
+            />
           </div>
 
           <Divider variant="single" />

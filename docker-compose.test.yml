@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: public.ecr.aws/docker/library/postgres:16-alpine
     environment:
       POSTGRES_USER: graph
       POSTGRES_PASSWORD: graph
@@ -14,7 +14,7 @@ services:
       retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: public.ecr.aws/docker/library/redis:7-alpine
     ports:
       - "6380:6379"
     healthcheck:
