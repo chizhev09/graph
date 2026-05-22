@@ -1,0 +1,19 @@
+{
+  "phones": [
+    {"slug": "iphone_15_pro_max", "label": "iPhone 15 Pro Max", "subcategory": "iphone"},
+    {"slug": "iphone_15_pro", "label": "iPhone 15 Pro", "subcategory": "iphone"},
+    {"slug": "iphone_15", "label": "iPhone 15", "subcategory": "iphone"},
+    {"slug": "iphone_14_pro", "label": "iPhone 14 Pro", "subcategory": "iphone"},
+    {"slug": "iphone_14", "label": "iPhone 14", "subcategory": "iphone"},
+    {"slug": "iphone_13", "label": "iPhone 13", "subcategory": "iphone"},
+    {"slug": "samsung_s24_ultra", "label": "Samsung S24 Ultra", "subcategory": "samsung"},
+    {"slug": "samsung_s24", "label": "Samsung S24", "subcategory": "samsung"}
+  ],
+  "laptops": [
+    {"slug": "macbook_pro_m3", "label": "MacBook Pro M3", "subcategory": "macbook"},
+    {"slug": "macbook_air_m2", "label": "MacBook Air M2", "subcategory": "macbook"}
+  ],
+  "audio": [
+    {"slug": "airpods_pro_2", "label": "AirPods Pro 2", "subcategory": "airpods"}
+  ]
+}

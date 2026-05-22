@@ -1,0 +1,47 @@
+.main-divider {
+  width: calc(100% + 32px);
+  margin-left: -16px;
+  margin-right: -16px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.main-divider--double {
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+.main-divider--single {
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.main-divider__svg {
+  display: block;
+  width: 100%;
+}
+
+.main-divider--double .main-divider__svg {
+  height: 40px;
+}
+
+.main-divider--single .main-divider__svg {
+  height: 24px;
+}
+
+.main-divider__line {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+.main-divider--single .main-divider__line {
+  stroke: rgba(255, 255, 255, 0.22);
+}
+
+.main-divider__line--2 {
+  stroke: rgba(255, 255, 255, 0.14);
+}

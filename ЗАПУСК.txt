@@ -1,0 +1,62 @@
+Graph — как запустить проект
+============================
+
+Нужно: Node.js, Python 3.10+
+
+
+ПЕРВЫЙ ЗАПУСК (один раз)
+------------------------
+
+Backend:
+  cd backend
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  pip install -r requirements.txt
+
+Frontend:
+  cd frontend
+  npm install
+
+
+BACKEND (FastAPI)
+-----------------
+
+  cd backend
+  .\.venv\Scripts\Activate.ps1
+  copy .env.example .env
+  docker compose up -d postgres redis
+  (PostgreSQL на порту 5433 — если 5432 занят другим сервером)
+  python scripts/sync_categories.py
+  alembic upgrade head
+  uvicorn main:app --reload --port 8000
+
+Адрес API:     http://localhost:8000
+Документация:  http://localhost:8000/docs
+Проверка:      http://localhost:8000/api/health
+
+
+FRONTEND (React + Vite)
+-----------------------
+
+  cd frontend
+  npm run dev
+
+Сайт:  http://localhost:5173
+
+
+ОБА СРАЗУ
+---------
+
+Открой 2 терминала:
+  1) backend  — uvicorn (порт 8000)
+  2) frontend — npm run dev (порт 5173)
+
+Фронт проксирует /api на backend (см. frontend/vite.config.ts).
+
+
+СБОРКА ФРОНТА (production)
+---------------------------
+
+  cd frontend
+  npm run build
+  npm run preview
